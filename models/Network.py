@@ -27,6 +27,8 @@ if sys.version_info[0] < 3:
     reload(sys)
     sys.setdefaultencoding("utf-8")
 
+from keras.callbacks import EarlyStopping, ModelCheckpoint
+import time
 from keras.models import Sequential, Model
 from keras.layers import Input, Embedding, Dense, LSTM, GRU, Conv1D, GlobalMaxPooling1D, MaxPooling1D, GlobalAveragePooling1D
 from keras.layers import TimeDistributed, RepeatVector, Permute, Lambda, Bidirectional, Dropout
@@ -38,45 +40,48 @@ from keras.optimizers import RMSprop, Adam, SGD, Adagrad, Adadelta, Adamax, Nada
 from keras.layers.advanced_activations import PReLU
 
 class Network(object):
-    def __init__(self):
-        self.nb_words = 200000
-        self.embedding_dims = 200
-        self.maxlen = 200
-        self.rnn_dims = 200
-        self.dropout_rate = 0.5
+    def __init__(self, maxlen=200, units=5, nb_words=200000,
+                 embedding_dims=200, rnn_dim=200, dropout_rate=0.5,
+                 loss='categorical_crossentropy', optimizer='nadam'):
+        self.nb_words = nb_words
+        self.embedding_dims = embedding_dims
+        self.maxlen = maxlen
+        self.rnn_dim = rnn_dim
+        self.dropout_rate = dropout_rate
+        self.units = units
+        self.loss = loss
+        self.optimizer = optimizer
 
-    def bidirectional_lstm(self, embedding_matrix=None):
-        print('Build Bidirectional LSTM model...')
+    def set_name(self, model_name):
+        self.model_name = model_name
 
-        if embedding_matrix == None:
-            # # embedding_matrix = np.zeros((config.max_features, config.embedding_dims))
-            # numpy_rng = np.random.RandomState(4321)
-            # embedding_matrix = numpy_rng.uniform(low=-0.05, high=0.05, size=(config.max_features, config.embedding_dims))
-            embedding_layer = Embedding(self.nb_words,
-                                        self.embedding_dims,
-                                        input_length=self.maxlen)
+    def build(self, embedding_matrix=None):
+        self.model = Model()
 
-        else:
-            embedding_layer = Embedding(self.nb_words,
-                                        self.embedding_dims,
-                                        weights=[embedding_matrix],
-                                        input_length=self.maxlen,
-                                        trainable=False)
+    def inference(self, x, model_path, batch_size):
+        self.model.load_weights(filepath=model_path)
+        y = self.model.predict(x, batch_size=batch_size)
+        return y
 
-        sequence_input = Input(shape=(self.maxlen,), dtype='int32')
-        embedded_sequences = embedding_layer(sequence_input)
+    def train(self, feature, target):
 
-        x = Bidirectional(LSTM(self.rnn_dims))(embedded_sequences)
-        x = Dropout(self.dropout_rate)(x)
-        preds = Dense(5, activation='softmax')(x)
-        model = Model(inputs=sequence_input, outputs=preds)
+        early_stopping = EarlyStopping(monitor='val_acc', patience=3)
+        now_time = '_'.join(time.asctime(time.localtime(time.time())).split(' '))
+        bst_model_path = './models/save/' + self.model_name + '_' + now_time + '.h5'
+        print('bst_model_path:', bst_model_path)
+        model_checkpoint = ModelCheckpoint(bst_model_path, monitor='val_acc', save_best_only=True,
+                                           save_weights_only=True)
 
-        model.compile(loss='categorical_crossentropy',
-                      optimizer='nadam',
-                      metrics=['acc'])
-        model.summary()
-        return model
-        
+        if os.path.exists(bst_model_path):
+            self.model.load_weights(bst_model_path)
+
+        self.model.fit(feature, target,
+                       batch_size=50,
+                       nb_epoch=10, shuffle=True,
+                       validation_split=0.2,
+                       # callbacks=[model_checkpoint])
+                       callbacks=[early_stopping, model_checkpoint])
+
 def func():
     pass
 

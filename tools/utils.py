@@ -29,7 +29,7 @@ if sys.version_info[0] < 3:
 
 import codecs
 from keras.preprocessing.text import Tokenizer
-from keras.preprocessing.sequence import pad_sequences
+from keras.preprocessing import sequence
 from keras.utils import to_categorical
 
 def convert(line):
@@ -53,9 +53,9 @@ def get_sequences(tokenizer, text):
 
 def pad_sequences(sequences, maxlen=None):
     if maxlen == None:
-        return pad_sequences(sequences, maxlen=100)
+        return sequence.pad_sequences(sequences, maxlen=100)
     else:
-        return pad_sequences(sequences, maxlen)
+        return sequence.pad_sequences(sequences, maxlen)
 
 def get_categorical(labels, num_classes=5):
     return to_categorical(labels, num_classes)
