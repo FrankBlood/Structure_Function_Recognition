@@ -67,7 +67,8 @@ class BiLSTM(Network):
 
         x = Bidirectional(LSTM(self.rnn_dim))(embedded_sequences)
         x = Dropout(self.dropout_rate)(x)
-        preds = Dense(5, activation='softmax')(x)
+        x = Dense(128, activation='relu')(x)
+        preds = Dense(self.units, activation='softmax')(x)
         model = Model(inputs=sequence_input, outputs=preds)
 
         model.compile(loss=self.loss,

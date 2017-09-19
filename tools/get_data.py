@@ -34,17 +34,16 @@ from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
 import numpy as np
 
-def get_data():
-    file_path = sys.argv[1]
+def get_data(file_path):
     data_loader = Data_Loader()
     paras, labels = data_loader.get_para_label(file_path)
-    tokenizer = Tokenizer(num_words=200000)
+    tokenizer = Tokenizer()
     tokenizer.fit_on_texts(paras)
     sequences = tokenizer.texts_to_sequences(paras)
-    paded_sequences = pad_sequences(sequences, maxlen=200)
-    return paded_sequences, get_categorical(np.array(labels))
+    paded_sequences = pad_sequences(sequences, maxlen=150)
+    return paded_sequences, get_categorical(np.array(labels)), tokenizer.word_index
 
 if __name__ == "__main__":
-    data, label = get_data()
+    data, label = get_data(sys.argv[1])
     print(data)
     print(label)

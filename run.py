@@ -29,14 +29,34 @@ if sys.version_info[0] < 3:
 
 from tools.get_data import get_data
 from models.BiLSTM import BiLSTM
+from models.BiGRU import BiGRU
+from tools.utils import get_embedding_matrix
 
-os.environ['CUDA_VISIBLE_DEVICES']=sys.argv[1]
+import codecs
+import json
 
 def train():
-    network = BiLSTM()
-    network.build()
     
-    paded_sequences, labels = get_data()
+    config_path = sys.argv[1]
+    config = {}
+    with codecs.open(config_path, encoding='utf8') as fp:
+        config = json.loads(fp.read().strip())
+    
+    model_name = config['model_name']
+    print(model_name)
+    if model_name == 'BiGRU':
+        network = BiGRU()
+    elif model_name == 'BiLSTM':
+        network = BiLSTM()
+    else:
+        print("What the FUCK!")
+        return
+    
+    paded_sequences, labels, word_index = get_data(config['data_path'])
+
+    embedding_matrix = get_embedding_matrix(config['embedding_path'], word_index, max_features=2000000, embedding_dims=200)
+    
+    network.build(embedding_matrix)
 
     network.train(paded_sequences, labels)
 

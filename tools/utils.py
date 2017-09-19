@@ -28,10 +28,56 @@ if sys.version_info[0] < 3:
     sys.setdefaultencoding("utf-8")
 
 import codecs
-from keras.preprocessing.text import Tokenizer
-from keras.preprocessing import sequence
+from keras.preprocessing.text import Tokenizer, text_to_word_sequence
+from keras.preprocessing.sequence import pad_sequences
 from keras.utils import to_categorical
+import numpy as np
 
+def get_embedding_matrix(embedding_path, word_index, max_features, embedding_dims):
+    print('Preparing embedding matrix')
+
+    nb_words = min(max_features, len(word_index)) + 1
+    # embedding_matrix = np.zeros((nb_words, EMBEDDING_DIM))
+    numpy_rng = np.random.RandomState(4321)
+    embedding_matrix = numpy_rng.uniform(low=-0.05, high=0.05, size=(nb_words, embedding_dims))
+    embeddings_from_file = {}
+    with codecs.open(embedding_path, encoding='utf8') as embedding_file:
+        embedding_file.readline()
+        while True:
+            line = embedding_file.readline()
+            if not line:
+                break
+            fields = line.strip().split(' ')
+            word = fields[0]
+            vector = np.array(fields[1:], dtype='float32')
+            embeddings_from_file[word] = vector
+
+    count = 0
+    for word, i in word_index.items():
+        if word in embeddings_from_file:
+            embedding_matrix[i] = embeddings_from_file[word]
+            count += 1
+    print('nb words is', nb_words)
+    print('num of word embeddings:', count)
+    print('Null word embeddings: %d' % (nb_words - count))
+
+    return embedding_matrix
+
+def convert_sequence(text):
+    return ' '.join(text_to_word_sequence(text))
+
+def get_all_para(file_path, save_path):
+    fw = open(save_path, 'a')
+    with codecs.open(file_path, encoding='utf8') as fp:
+        while True:
+            line = fp.readline()
+            if not line:
+                fw.close()
+                return
+            text = line.strip().split('\t')[-1]
+            text = convert_sequence(text.encode('utf8'))
+            fw.write(text+' ')
+        
 def convert(line):
     line = line.strip().split()
     return line
@@ -51,11 +97,11 @@ def get_sequences(tokenizer, text):
     sequences = tokenizer.texts_to_sequences(text)
     return sequences
 
-def pad_sequences(sequences, maxlen=None):
+def get_padded_sequences(sequences, maxlen=None):
     if maxlen == None:
-        return sequence.pad_sequences(sequences, maxlen=100)
+        return pad_sequences(sequences, maxlen=100)
     else:
-        return sequence.pad_sequences(sequences, maxlen)
+        return pad_sequences(sequences, maxlen)
 
 def get_categorical(labels, num_classes=5):
     return to_categorical(labels, num_classes)
@@ -64,4 +110,4 @@ def func():
     pass
 
 if __name__ == "__main__":
-    func()
+    get_all_para(sys.argv[1], sys.argv[2])

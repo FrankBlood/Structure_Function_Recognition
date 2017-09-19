@@ -39,9 +39,11 @@ from keras.layers import Activation
 from keras.optimizers import RMSprop, Adam, SGD, Adagrad, Adadelta, Adamax, Nadam
 from keras.layers.advanced_activations import PReLU
 
+import json
+
 class Network(object):
-    def __init__(self, maxlen=200, units=5, nb_words=200000,
-                 embedding_dims=200, rnn_dim=200, dropout_rate=0.5,
+    def __init__(self, maxlen=150, units=5, nb_words=2000000,
+                 embedding_dims=200, rnn_dim=256, dropout_rate=0.5,
                  loss='categorical_crossentropy', optimizer='nadam'):
         self.nb_words = nb_words
         self.embedding_dims = embedding_dims
@@ -51,6 +53,19 @@ class Network(object):
         self.units = units
         self.loss = loss
         self.optimizer = optimizer
+
+    def set_from_json(self, config_json_path=curdir+'/config_bigru.json'):
+        with codecs.open(config_json_path, encoding="utf8") as fp:
+            config = json.loads(fp.read().strip())
+            self.nb_words = config['nb_words']
+            self.embedding_dims = config['embedding_dims']
+            self.maxlen = config['maxlen']
+            self.rnn_dim = config['rnn_dim']
+            self.dropout_rate = config['dropout_rate']
+            self.units = config['units']
+            self.loss = config['loss']
+            self.optimizer = config['optimizer']
+            
 
     def set_name(self, model_name):
         self.model_name = model_name
