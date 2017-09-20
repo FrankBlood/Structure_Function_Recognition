@@ -33,6 +33,7 @@ import codecs
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
 import numpy as np
+import json
 
 def get_data(file_path):
     data_loader = Data_Loader()
@@ -44,6 +45,8 @@ def get_data(file_path):
     return paded_sequences, get_categorical(np.array(labels)), tokenizer.word_index
 
 if __name__ == "__main__":
-    data, label = get_data(sys.argv[1])
-    print(data)
-    print(label)
+    data, label, word_index = get_data(sys.argv[1])
+    # print(data)
+    # print(label)
+    with open('aaa.dict', 'w') as fw:
+        fw.write(json.dumps(word_index))

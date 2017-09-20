@@ -41,22 +41,31 @@ def get_embedding_matrix(embedding_path, word_index, max_features, embedding_dim
     numpy_rng = np.random.RandomState(4321)
     embedding_matrix = numpy_rng.uniform(low=-0.05, high=0.05, size=(nb_words, embedding_dims))
     embeddings_from_file = {}
+    miss_count = 0
     with codecs.open(embedding_path, encoding='utf8') as embedding_file:
         embedding_file.readline()
         while True:
-            line = embedding_file.readline()
-            if not line:
-                break
+            try:
+                line = embedding_file.readline()
+                if not line:
+                    break
+            except:
+                miss_count += 1
+            # print(line)
             fields = line.strip().split(' ')
             word = fields[0]
             vector = np.array(fields[1:], dtype='float32')
             embeddings_from_file[word] = vector
 
+    print('num of embedding file is ', len(embeddings_from_file))
     count = 0
-    for word, i in word_index.items():
+    for word, i in word_index.iteritems():
         if word in embeddings_from_file:
             embedding_matrix[i] = embeddings_from_file[word]
             count += 1
+        # else:
+            # print(word)
+    print('miss word embedding is', miss_count)
     print('nb words is', nb_words)
     print('num of word embeddings:', count)
     print('Null word embeddings: %d' % (nb_words - count))

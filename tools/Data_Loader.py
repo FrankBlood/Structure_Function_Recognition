@@ -46,7 +46,8 @@ class Data_Loader(object):
                     return paras, labels
                 tmp = line.strip().split('\t')[-2:]
                 label, para = int(tmp[0]), tmp[1]
-                paras.append(para.strip().encode('utf8'))
+                # paras.append(para.strip().encode('utf8'))
+                paras.append(convert_sequence(para.strip().encode('utf8')))
                 labels.append(label)
     
     def get_section_label(self, file_path):
