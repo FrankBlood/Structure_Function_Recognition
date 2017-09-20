@@ -54,17 +54,14 @@ class Network(object):
         self.loss = loss
         self.optimizer = optimizer
 
-    def set_from_json(self, config_json_path=curdir+'/config_bigru.json'):
-        with codecs.open(config_json_path, encoding="utf8") as fp:
-            config = json.loads(fp.read().strip())
-            self.nb_words = config['nb_words']
-            self.embedding_dims = config['embedding_dims']
-            self.maxlen = config['maxlen']
-            self.rnn_dim = config['rnn_dim']
-            self.dropout_rate = config['dropout_rate']
-            self.units = config['units']
-            self.loss = config['loss']
-            self.optimizer = config['optimizer']
+    def set_from_json(self, network_config):
+        self.embedding_dims = network_config['embedding_dims']
+        self.maxlen = network_config['maxlen']
+        self.rnn_dim = network_config['rnn_dim']
+        self.dropout_rate = network_config['dropout_rate']
+        self.units = network_config['units']
+        self.loss = network_config['loss']
+        self.optimizer = network_config['optimizer']
             
 
     def set_name(self, model_name):

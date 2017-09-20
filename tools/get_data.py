@@ -35,13 +35,13 @@ from keras.preprocessing.sequence import pad_sequences
 import numpy as np
 import json
 
-def get_data(file_path):
+def get_data(file_path, num_words=None, maxlen=150):
     data_loader = Data_Loader()
     paras, labels = data_loader.get_para_label(file_path)
-    tokenizer = Tokenizer()
+    tokenizer = Tokenizer(num_words=num_words)
     tokenizer.fit_on_texts(paras)
     sequences = tokenizer.texts_to_sequences(paras)
-    paded_sequences = pad_sequences(sequences, maxlen=150)
+    paded_sequences = pad_sequences(sequences, maxlen=maxlen)
     return paded_sequences, get_categorical(np.array(labels)), tokenizer.word_index
 
 if __name__ == "__main__":
