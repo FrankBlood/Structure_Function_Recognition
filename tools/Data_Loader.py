@@ -36,7 +36,7 @@ class Data_Loader(object):
     def __init__(self):
         print("Data loading...")
 
-    def get_para_label(self, file_path):
+    def get_para_label(self, file_path, filter_json=None):
         paras = []
         labels = []
         with codecs.open(file_path, encoding='utf8') as fp:
@@ -47,7 +47,7 @@ class Data_Loader(object):
                 tmp = line.strip().split('\t')[-2:]
                 label, para = int(tmp[0]), tmp[1]
                 # paras.append(para.strip().encode('utf8'))
-                paras.append(convert_sequence(para.strip().encode('utf8')))
+                paras.append(convert_sequence(para.strip().encode('utf8'), filter_json=filter_json))
                 labels.append(label)
     
     def get_section_label(self, file_path):

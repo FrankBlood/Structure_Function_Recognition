@@ -57,6 +57,9 @@ def train():
     with open(config['word_index_path'], 'r') as fp:
         word_index = json.load(fp)
 
+    with open(config['filter_json_path'], 'r') as fp:
+        filter_json = json.load(fp)
+
     network.nb_words = min(len(word_index), config['network_config']['num_words'])+1
 
     embedding_matrix = get_embedding_matrix(config['embedding_path'],
@@ -66,9 +69,10 @@ def train():
     
     network.build(embedding_matrix)
 
-    paded_sequences, labels, _ = get_data(config['data_path'],
-                                          num_words=config['network_config']['num_words'],
-                                          maxlen=config['network_config']['maxlen'])
+    paded_sequences, labels, _, _ = get_data(config['data_path'],
+                                             filter_json = filter_json,
+                                             num_words=config['network_config']['num_words'],
+                                             maxlen=config['network_config']['maxlen'])
 
     network.train(paded_sequences, labels)
 

@@ -2,7 +2,7 @@
 # -*- coding:utf8 -*-
 
 """
-BiGRU
+BasicCNN
 ======
 
 A class for something.
@@ -10,7 +10,7 @@ A class for something.
 @author: Guoxiu He
 @contact: guoxiu.he@whu.edu.cn
 @site: https://frankblood.github.io
-@time: 17-9-17上午11:16
+@time: 17-9-20上午9:59
 @copyright: "Copyright (c) 2017 Guoxiu He. All Rights Reserved"
 """
 
@@ -39,17 +39,15 @@ from keras.layers import Activation
 from keras.optimizers import RMSprop, Adam, SGD, Adagrad, Adadelta, Adamax, Nadam
 from keras.layers.advanced_activations import PReLU
 
-import numpy as np
-
-class BiGRU(Network):
+class BasicCNN(object):
     def __init__(self):
         Network.__init__(self)
 
-    def build(self, embedding_matrix=np.array([None])):
+    def build(self, embedding_matrix=None):
         print('Build Bidirectional LSTM model...')
         self.set_name("BiLSTM")
 
-        if embedding_matrix.any() == None:
+        if embedding_matrix == None:
             # # embedding_matrix = np.zeros((config.max_features, config.embedding_dims))
             # numpy_rng = np.random.RandomState(4321)
             # embedding_matrix = numpy_rng.uniform(low=-0.05, high=0.05, size=(config.max_features, config.embedding_dims))
@@ -67,8 +65,9 @@ class BiGRU(Network):
         sequence_input = Input(shape=(self.maxlen,), dtype='int32')
         embedded_sequences = embedding_layer(sequence_input)
 
-        x = Bidirectional(GRU(self.rnn_dim))(embedded_sequences)
+        x = Bidirectional(LSTM(self.rnn_dim))(embedded_sequences)
         x = Dropout(self.dropout_rate)(x)
+        x = Dense(128, activation='relu')(x)
         preds = Dense(self.units, activation='softmax')(x)
         model = Model(inputs=sequence_input, outputs=preds)
 
@@ -78,9 +77,11 @@ class BiGRU(Network):
         model.summary()
         self.model = model
 
+
 def func():
-    network = BiGRU()
+    network = BiLSTM()
     network.build()
+
 
 if __name__ == "__main__":
     func()

@@ -39,15 +39,17 @@ from keras.layers import Activation
 from keras.optimizers import RMSprop, Adam, SGD, Adagrad, Adadelta, Adamax, Nadam
 from keras.layers.advanced_activations import PReLU
 
+import numpy as np
+
 class BiLSTM(Network):
     def __init__(self):
         Network.__init__(self)
 
-    def build(self, embedding_matrix=None):
+    def build(self, embedding_matrix=np.array([None])):
         print('Build Bidirectional LSTM model...')
         self.set_name("BiLSTM")
 
-        if embedding_matrix == None:
+        if embedding_matrix.any() == None:
             # # embedding_matrix = np.zeros((config.max_features, config.embedding_dims))
             # numpy_rng = np.random.RandomState(4321)
             # embedding_matrix = numpy_rng.uniform(low=-0.05, high=0.05, size=(config.max_features, config.embedding_dims))

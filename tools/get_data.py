@@ -35,18 +35,20 @@ from keras.preprocessing.sequence import pad_sequences
 import numpy as np
 import json
 
-def get_data(file_path, num_words=None, maxlen=150):
+def get_data(file_path, num_words=None, maxlen=150, filter_json=None):
     data_loader = Data_Loader()
-    paras, labels = data_loader.get_para_label(file_path)
+    paras, labels = data_loader.get_para_label(file_path, filter_json)
     tokenizer = Tokenizer(num_words=num_words)
     tokenizer.fit_on_texts(paras)
     sequences = tokenizer.texts_to_sequences(paras)
     paded_sequences = pad_sequences(sequences, maxlen=maxlen)
-    return paded_sequences, get_categorical(np.array(labels)), tokenizer.word_index
+    return paded_sequences, get_categorical(np.array(labels)), tokenizer.word_index, tokenizer.word_counts
 
 if __name__ == "__main__":
-    data, label, word_index = get_data(sys.argv[1])
+    data, label, word_index, word_counts = get_data(sys.argv[1], num_words=260000)
     # print(data)
     # print(label)
-    with open('aaa.dict', 'w') as fw:
-        fw.write(json.dumps(word_index))
+    with open('../data/word_counts.json', 'w') as fw:
+        fw.write(json.dumps(word_counts))
+    # with open('aaa.dict', 'w') as fw:
+    #     fw.write(json.dumps(word_index))

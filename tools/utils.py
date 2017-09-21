@@ -36,7 +36,8 @@ import numpy as np
 def get_embedding_matrix(embedding_path, word_index, max_features, embedding_dims):
     print('Preparing embedding matrix')
 
-    nb_words = min(max_features, len(word_index)) + 1
+    # nb_words = min(max_features, len(word_index)) + 1
+    nb_words = len(word_index) + 1
     # embedding_matrix = np.zeros((nb_words, EMBEDDING_DIM))
     numpy_rng = np.random.RandomState(4321)
     embedding_matrix = numpy_rng.uniform(low=-0.05, high=0.05, size=(nb_words, embedding_dims))
@@ -72,8 +73,12 @@ def get_embedding_matrix(embedding_path, word_index, max_features, embedding_dim
 
     return embedding_matrix
 
-def convert_sequence(text):
-    return ' '.join(text_to_word_sequence(text))
+def convert_sequence(text, filter_json=None):
+    sequence = text_to_word_sequence(text)
+    if filter_json == None:
+        return ' '.join(sequence)
+    new_sequence = [term for term in sequence if term in filter_json]
+    return ' '.join(new_sequence)
 
 def get_all_para(file_path, save_path):
     fw = open(save_path, 'a')
