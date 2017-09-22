@@ -51,7 +51,7 @@ def train():
     elif model_name == 'BasicCNN':
         network = BasicCNN()
     else:
-        print("What the FUCK!")
+        print("What the F**K!")
         return
 
     with open(config['word_index_path'], 'r') as fp:
