@@ -76,6 +76,7 @@ class Network(object):
         return y
 
     def train(self, feature, target):
+        print('Begin to train...')
 
         early_stopping = EarlyStopping(monitor='val_acc', patience=3)
         now_time = '_'.join(time.asctime(time.localtime(time.time())).split(' '))
@@ -93,6 +94,24 @@ class Network(object):
                        validation_split=0.2,
                        # callbacks=[model_checkpoint])
                        callbacks=[early_stopping, model_checkpoint])
+
+    def set_optimizer(self, optimizer_name='nadam' ,lr=0.001):
+        if optimizer_name == 'sgd':
+            self.optimizer = SGD(lr=lr)
+        elif optimizer_name == 'rmsprop':
+            self.optimizer = RMSprop(lr=lr)
+        elif optimizer_name == 'adagrad':
+            self.optimizer = Adagrad(lr=lr)
+        elif optimizer_name == 'adadelta':
+            self.optimizer = Adadelta(lr=lr)
+        elif optimizer_name == 'adam':
+            self.optimizer = Adam(lr=lr)
+        elif optimizer_name == 'adamax':
+            self.optimizer = Adamax(lr=lr)
+        elif optimizer_name == 'nadam':
+            self.optimizer = Nadam(lr=lr)
+        else:
+            print("What the F**K!")
 
 def func():
     pass

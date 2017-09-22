@@ -39,13 +39,13 @@ from keras.layers import Activation
 from keras.optimizers import RMSprop, Adam, SGD, Adagrad, Adadelta, Adamax, Nadam
 from keras.layers.advanced_activations import PReLU
 
-class BasicCNN(object):
+class BasicCNN(Network):
     def __init__(self):
         Network.__init__(self)
 
     def build(self, embedding_matrix=None):
-        print('Build Bidirectional LSTM model...')
-        self.set_name("BiLSTM")
+        print('Build basic CNN model...')
+        self.set_name("BasicCNN")
 
         if embedding_matrix == None:
             # # embedding_matrix = np.zeros((config.max_features, config.embedding_dims))
@@ -79,7 +79,7 @@ class BasicCNN(object):
 
 
 def func():
-    network = BiLSTM()
+    network = BasicCNN()
     network.build()
 
 

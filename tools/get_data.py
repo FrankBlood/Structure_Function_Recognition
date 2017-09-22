@@ -40,8 +40,11 @@ def get_data(file_path, num_words=None, maxlen=150, filter_json=None):
     paras, labels = data_loader.get_para_label(file_path, filter_json)
     tokenizer = Tokenizer(num_words=num_words)
     tokenizer.fit_on_texts(paras)
+    print('tokenizer fitted successfully!')
     sequences = tokenizer.texts_to_sequences(paras)
+    print('sequences converted successfully!')
     paded_sequences = pad_sequences(sequences, maxlen=maxlen)
+    print('sequences padded successfully!')
     return paded_sequences, get_categorical(np.array(labels)), tokenizer.word_index, tokenizer.word_counts
 
 if __name__ == "__main__":

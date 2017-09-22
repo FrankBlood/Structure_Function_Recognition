@@ -46,8 +46,8 @@ class BiGRU(Network):
         Network.__init__(self)
 
     def build(self, embedding_matrix=np.array([None])):
-        print('Build Bidirectional LSTM model...')
-        self.set_name("BiLSTM")
+        print('Build Bidirectional GRU model...')
+        self.set_name("BiGRU")
 
         if embedding_matrix.any() == None:
             # # embedding_matrix = np.zeros((config.max_features, config.embedding_dims))

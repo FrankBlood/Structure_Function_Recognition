@@ -62,6 +62,8 @@ def train():
 
     network.nb_words = min(len(word_index), config['network_config']['num_words'])+1
 
+    network.set_optimizer(optimizer_name='nadam' ,lr=0.001)
+
     embedding_matrix = get_embedding_matrix(config['embedding_path'],
                                             word_index,
                                             max_features=config['network_config']['num_words'],

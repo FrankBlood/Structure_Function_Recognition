@@ -43,6 +43,7 @@ class Data_Loader(object):
             while True:
                 line = fp.readline()
                 if not line:
+                    print("Data loaded successfully!")
                     return paras, labels
                 tmp = line.strip().split('\t')[-2:]
                 label, para = int(tmp[0]), tmp[1]
