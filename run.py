@@ -31,6 +31,9 @@ from tools.get_data import get_data
 from models.BiLSTM import BiLSTM
 from models.BiGRU import BiGRU
 from models.BasicCNN import BasicCNN
+from models.BiLstmPool import BiLstmPool
+from models.BiGruPool import BiGruPool
+from models.BiGruConv import BiGruConv
 from tools.utils import get_embedding_matrix
 
 import codecs
@@ -50,6 +53,12 @@ def train():
         network = BiLSTM()
     elif model_name == 'BasicCNN':
         network = BasicCNN()
+    elif model_name == 'BiLstmPool':
+        network = BiLstmPool()
+    elif model_name == 'BiGruPool':
+        network = BiGruPool()
+    elif model_name == 'BiGruConv':
+        network = BiGruConv()
     else:
         print("What the F**K!")
         return
@@ -62,7 +71,7 @@ def train():
 
     network.nb_words = min(len(word_index), config['network_config']['num_words'])+1
 
-    network.set_optimizer(optimizer_name='nadam' ,lr=0.001)
+    network.set_optimizer(optimizer_name=config['network_config']['optimizer_name'], lr=config['network_config']['lr'])
 
     embedding_matrix = get_embedding_matrix(config['embedding_path'],
                                             word_index,
