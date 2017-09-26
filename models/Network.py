@@ -75,7 +75,7 @@ class Network(object):
         y = self.model.predict(x, batch_size=batch_size)
         return y
 
-    def train(self, feature, target):
+    def train(self, train_feature, train_target, dev_feature=np.array(None), dev_target=np.array(None)):
         print('Begin to train...')
 
         early_stopping = EarlyStopping(monitor='val_acc', patience=3)
@@ -88,12 +88,22 @@ class Network(object):
         if os.path.exists(bst_model_path):
             self.model.load_weights(bst_model_path)
 
-        self.model.fit(feature, target,
-                       batch_size=50,
-                       nb_epoch=10, shuffle=True,
-                       validation_split=0.2,
-                       # callbacks=[model_checkpoint])
-                       callbacks=[early_stopping, model_checkpoint])
+        if dev_feature.any() == None or dev_target.any()==None:
+            self.model.fit(train_feature, train_target,
+                           batch_size=50,
+                           nb_epoch=10, shuffle=True,
+                           validation_split=0.2,
+                           # callbacks=[model_checkpoint])
+                           callbacks=[early_stopping, model_checkpoint])
+        
+        else:
+            self.model.fit(train_feature, train_target,
+                           batch_size=50,
+                           nb_epoch=10, shuffle=True,
+                           validation_data=(dev_feature, dev_target),
+                           # callbacks=[model_checkpoint])
+                           callbacks=[early_stopping, model_checkpoint])
+           
 
     def set_optimizer(self, optimizer_name='nadam' ,lr=0.001):
         if optimizer_name == 'sgd':

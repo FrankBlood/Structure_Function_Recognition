@@ -34,7 +34,9 @@ from models.BasicCNN import BasicCNN
 from models.BiLstmPool import BiLstmPool
 from models.BiGruPool import BiGruPool
 from models.BiGruConv import BiGruConv
-from tools.utils import get_embedding_matrix
+from models.BiLstmConv import BiLstmConv
+from models.BiLstmConv3 import BiLstmConv3
+from tools.utils import get_embedding_matrix, split_rate
 
 import codecs
 import json
@@ -59,6 +61,10 @@ def train():
         network = BiGruPool()
     elif model_name == 'BiGruConv':
         network = BiGruConv()
+    elif model_name == 'BiLstmConv':
+        network = BiLstmConv()
+    elif model_name == 'BiLstmConv3':
+        network = BiLstmConv3()
     else:
         print("What the F**K!")
         return

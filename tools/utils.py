@@ -32,6 +32,20 @@ from keras.preprocessing.text import Tokenizer, text_to_word_sequence
 from keras.preprocessing.sequence import pad_sequences
 from keras.utils import to_categorical
 import numpy as np
+import random
+
+def split_data(feature, lable, split_rate=0.2):
+    num = len(feature)
+    idx = range(num)
+    random.shuffle(idx)
+    test_feature = feature[idx[:num*split_rate]]
+    test_lable = lable[idx[:num*split_rate]]
+    dev_feature = feature[idx[num*split_rate: num*2*split_rate]]
+    dev_lable = lable[idx[num*split_rate: num*2*split_rate]]
+    train_feature = feature[idx[num*2*split_rate:]]
+    train_lable = lable[idx[num*2*split_rate:]]
+    return train_feature, train_lable, dev_feature, dev_lable, test_feature, test_lable
+    
 
 def get_embedding_matrix(embedding_path, word_index, max_features, embedding_dims):
     print('Preparing embedding matrix')
