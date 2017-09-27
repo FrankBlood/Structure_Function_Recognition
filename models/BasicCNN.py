@@ -31,7 +31,7 @@ from Network import Network
 
 from keras.models import Sequential, Model
 from keras.layers import Input, Embedding, Dense, LSTM, GRU, Conv1D, Conv2D, GlobalMaxPooling1D, MaxPooling1D, GlobalAveragePooling1D, AveragePooling1D
-from keras.layers import TimeDistributed, RepeatVector, Permute, Lambda, Bidirectional, Dropout
+from keras.layers import TimeDistributed, RepeatVector, Permute, Lambda, Bidirectional, Dropout, Flatten
 from keras.layers.merge import concatenate, add, dot, multiply
 from keras.layers.normalization import BatchNormalization
 from keras import backend as K
@@ -73,10 +73,11 @@ class BasicCNN(Network):
         cnn1 = Dropout(self.dropout_rate)(cnn1)
         cnn1 = BatchNormalization()(cnn1)
         # cnn1 = Permute([2, 1])(cnn1)
-        cnn1 = GlobalMaxPooling1D()(cnn1)
-        # cnn1 = Dense(200, activation='relu')(cnn1)
-        # cnn1 = Dropout(self.dropout_rate)(cnn1)
-        # cnn1 = BatchNormalization()(cnn1)
+        cnn1 = MaxPooling1D()(cnn1)
+        cnn1 = Dense(200, activation='relu')(cnn1)
+        cnn1 = Dropout(self.dropout_rate)(cnn1)
+        cnn1 = BatchNormalization()(cnn1)
+        cnn1 = Flatten()(cnn1)
 
         cnn2 = Conv1D(filters=self.filters, kernel_size=self.kernel_size-1, activation='relu')(embedded_sequences)
         cnn2 = MaxPooling1D()(cnn2)
@@ -84,10 +85,11 @@ class BasicCNN(Network):
         cnn2 = Dropout(self.dropout_rate)(cnn2)
         cnn2 = BatchNormalization()(cnn2)
         # cnn2 = Permute([2, 1])(cnn2)
-        cnn2 = GlobalMaxPooling1D()(cnn2)
-        # cnn2 = Dense(200, activation='relu')(cnn2)
-        # cnn2 = Dropout(self.dropout_rate)(cnn2)
-        # cnn2 = BatchNormalization()(cnn2)
+        cnn2 = MaxPooling1D()(cnn2)
+        cnn2 = Dense(200, activation='relu')(cnn2)
+        cnn2 = Dropout(self.dropout_rate)(cnn2)
+        cnn2 = BatchNormalization()(cnn2)
+        cnn2 = Flatten()(cnn2)
 
         cnn3 = Conv1D(filters=self.filters, kernel_size=self.kernel_size-2, activation='relu')(embedded_sequences)
         cnn3 = MaxPooling1D()(cnn3)
@@ -95,10 +97,11 @@ class BasicCNN(Network):
         cnn3 = Dropout(self.dropout_rate)(cnn3)
         cnn3 = BatchNormalization()(cnn3)
         # cnn3 = Permute([2, 1])(cnn3)
-        cnn3 = GlobalMaxPooling1D()(cnn3)
-        # cnn3 = Dense(200, activation='relu')(cnn3)
-        # cnn3 = Dropout(self.dropout_rate)(cnn3)
-        # cnn3 = BatchNormalization()(cnn3)
+        cnn3 = MaxPooling1D()(cnn3)
+        cnn3 = Dense(200, activation='relu')(cnn3)
+        cnn3 = Dropout(self.dropout_rate)(cnn3)
+        cnn3 = BatchNormalization()(cnn3)
+        cnn3 = Flatten()(cnn3)
 
         cnn = concatenate([cnn1, cnn2, cnn3])
         cnn = Dense(300, activation='relu')(cnn)

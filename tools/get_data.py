@@ -27,13 +27,13 @@ if sys.version_info[0] < 3:
     reload(sys)
     sys.setdefaultencoding("utf-8")
 
-from utils import get_categorical
 from Data_Loader import Data_Loader
 import codecs
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
 import numpy as np
 import json
+from utils import split_data
 
 def get_data(file_path, num_words=None, maxlen=150, filter_json=None):
     data_loader = Data_Loader()
@@ -45,7 +45,7 @@ def get_data(file_path, num_words=None, maxlen=150, filter_json=None):
     print('sequences converted successfully!')
     paded_sequences = pad_sequences(sequences, maxlen=maxlen)
     print('sequences padded successfully!')
-    return paded_sequences, get_categorical(np.array(labels)), tokenizer.word_index, tokenizer.word_counts
+    return np.array(paded_sequences), np.array(labels), tokenizer.word_index, tokenizer.word_counts
 
 if __name__ == "__main__":
     data, label, word_index, word_counts = get_data(sys.argv[1], num_words=260000)

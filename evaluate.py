@@ -42,7 +42,7 @@ import codecs
 import json
 import numpy as np
 
-def train():
+def evaluate():
     
     config_path = sys.argv[1]
     with codecs.open(config_path, encoding='utf8') as fp:
@@ -79,43 +79,31 @@ def train():
     network.nb_words = min(len(word_index), config['network_config']['num_words'])+1
 
     network.set_optimizer(optimizer_name=config['network_config']['optimizer_name'], lr=config['network_config']['lr'])
-
-    embedding_matrix = get_embedding_matrix(config['embedding_path'],
-                                            word_index,
-                                            max_features=config['network_config']['num_words'],
-                                            embedding_dims=config['network_config']['embedding_dims'])
     
-    network.build(embedding_matrix)
+    network.build()
 
     paded_sequences, labels, _, _ = get_data(config['data_path'],
                                              filter_json = filter_json,
                                              num_words=config['network_config']['num_words'],
                                              maxlen=config['network_config']['maxlen'])
+
     categ_labels = to_categorical(labels)
 
-    # Data splite
-    train_feature, train_target, dev_feature, dev_target, test_feature, test_target = split_data(paded_sequences, categ_labels, 0.1)
+    _, _, _, _, test_feature, test_target = split_data(paded_sequences, categ_labels, 0.05)
 
-    # train model with training data and evaluate with development data
-    network.train(train_feature, train_target, dev_feature, dev_target)
+    model_path = sys.argv[2]
+    network.load_model(model_path)
 
-    # test model with test model
     loss, accu = network.evaluate(test_feature, test_target, batch_size=512)
     print('The total loss is %s and the total accuracy is %s'
-          % (loss, accu))
-
-    # get the accuracy, precision, recall and f1score
-
-    # get the predicted label
+          %(loss, accu))
     y = network.inference(test_feature, batch_size=512)
-    # get the label from softmax
     y_class = np.array(map(np.argmax, y))
-    # get the label from target
     target_class = np.array(map(np.argmax, test_target))
     for category in range(5):
         accuracy, precision, recall, f1score = get_a_p_r_f(target_class, y_class, category)
         print('For category %s: the accuracy is %s, the precision is %s, the recall is %s and the f1score is %s'
-              % (category, accuracy, precision, recall, f1score))
+              %(category, accuracy, precision, recall, f1score))
 
 if __name__ == "__main__":
-    train()
+    evaluate()

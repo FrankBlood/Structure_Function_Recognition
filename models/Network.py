@@ -39,6 +39,7 @@ from keras.layers import Activation
 from keras.optimizers import RMSprop, Adam, SGD, Adagrad, Adadelta, Adamax, Nadam
 from keras.layers.advanced_activations import PReLU
 
+import numpy as np
 import json
 
 class Network(object):
@@ -70,12 +71,23 @@ class Network(object):
     def build(self, embedding_matrix=None):
         self.model = Model()
 
-    def inference(self, x, model_path, batch_size):
-        self.model.load_weights(filepath=model_path)
+    def inference(self, x, batch_size=None):
+        # self.model.load_weights(filepath=model_path)
         y = self.model.predict(x, batch_size=batch_size)
+        # y_class = self.model.predict_classes(x, batch_size=batch_size)
+        # y_proba = self.model.predict_proba(x, batch_size=batch_size)
         return y
 
-    def train(self, train_feature, train_target, dev_feature=np.array(None), dev_target=np.array(None)):
+    def load_model(self, model_path):
+        self.model.load_weights(model_path)
+        print("successfully loaded!")
+
+
+    def evaluate(self, test_feature, test_target, batch_size=None):
+        # self.model.load_weights(filepath=model_path)
+        return self.model.evaluate(test_feature, test_target, batch_size=batch_size)
+
+    def train(self, train_feature, train_target, dev_feature=np.array([None]), dev_target=np.array([None])):
         print('Begin to train...')
 
         early_stopping = EarlyStopping(monitor='val_acc', patience=3)
@@ -95,7 +107,6 @@ class Network(object):
                            validation_split=0.2,
                            # callbacks=[model_checkpoint])
                            callbacks=[early_stopping, model_checkpoint])
-        
         else:
             self.model.fit(train_feature, train_target,
                            batch_size=50,

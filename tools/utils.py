@@ -34,17 +34,31 @@ from keras.utils import to_categorical
 import numpy as np
 import random
 
-def split_data(feature, lable, split_rate=0.2):
+
+def get_a_p_r_f(target, predict, category):
+    idx = np.array(range(len(target)))
+    _target = set(idx[target == category])
+    _predict = set(idx[predict == category])
+    true = _target & _predict
+    true_No = set(idx) - _target - _predict
+    accuracy = (len(true) + len(true_No)) / len(idx)
+    precision = len(true) / float(len(_predict))
+    recall = len(true) / float(len(_target))
+    f1_score = precision * recall * 2 / (precision + recall + 0.00001)
+    return accuracy, precision, recall, f1_score
+
+def split_data(feature, target, split_rate=0.2):
     num = len(feature)
     idx = range(num)
     random.shuffle(idx)
-    test_feature = feature[idx[:num*split_rate]]
-    test_lable = lable[idx[:num*split_rate]]
-    dev_feature = feature[idx[num*split_rate: num*2*split_rate]]
-    dev_lable = lable[idx[num*split_rate: num*2*split_rate]]
-    train_feature = feature[idx[num*2*split_rate:]]
-    train_lable = lable[idx[num*2*split_rate:]]
-    return train_feature, train_lable, dev_feature, dev_lable, test_feature, test_lable
+    test_feature = feature[idx[:int(num*split_rate)]]
+    test_target = target[idx[:int(num*split_rate)]]
+    dev_feature = feature[idx[int(num*split_rate): int(num*2*split_rate)]]
+    dev_target = target[idx[int(num*split_rate): int(num*2*split_rate)]]
+    train_feature = feature[idx[int(num*2*split_rate):]]
+    train_target = target[idx[int(num*2*split_rate):]]
+    print('splited successfully!')
+    return train_feature, train_target, dev_feature, dev_target, test_feature, test_target
     
 
 def get_embedding_matrix(embedding_path, word_index, max_features, embedding_dims):
@@ -64,13 +78,13 @@ def get_embedding_matrix(embedding_path, word_index, max_features, embedding_dim
                 line = embedding_file.readline()
                 if not line:
                     break
+                fields = line.strip().split(' ')
+                word = fields[0]
+                vector = np.array(fields[1:], dtype='float32')
+                embeddings_from_file[word] = vector
             except:
                 miss_count += 1
             # print(line)
-            fields = line.strip().split(' ')
-            word = fields[0]
-            vector = np.array(fields[1:], dtype='float32')
-            embeddings_from_file[word] = vector
 
     print('num of embedding file is ', len(embeddings_from_file))
     count = 0
@@ -132,6 +146,7 @@ def get_padded_sequences(sequences, maxlen=None):
         return pad_sequences(sequences, maxlen)
 
 def get_categorical(labels, num_classes=5):
+    print("start to categorical...")
     return to_categorical(labels, num_classes)
 
 def func():
