@@ -2,7 +2,7 @@
 # -*- coding:utf8 -*-
 
 """
-train
+memory
 ======
 
 A class for something.

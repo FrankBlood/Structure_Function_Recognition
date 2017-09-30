@@ -2,7 +2,7 @@
 # -*- coding:utf8 -*-
 
 """
-BasicCNN
+CNNLSTMPooling
 ======
 
 A class for something.
@@ -38,17 +38,18 @@ from keras import backend as K
 from keras.layers import Activation
 from keras.optimizers import RMSprop, Adam, SGD, Adagrad, Adadelta, Adamax, Nadam
 from keras.layers.advanced_activations import PReLU
+
 import numpy as np
 
-class BasicCNN(Network):
+class CnnLstmPooling(Network):
     def __init__(self):
         Network.__init__(self)
-        self.filters = 250
-        self.kernel_size = 3
+        self.filters = 100
+        self.kernel_size = 4
 
     def build(self, embedding_matrix=np.array([None])):
-        print('Build basic CNN model...')
-        self.set_name("BasicCNN")
+        print('Build CNN LSTM Pooling model...')
+        self.set_name("CnnLstmPooling")
 
         if embedding_matrix.any() == None:
             # # embedding_matrix = np.zeros((config.max_features, config.embedding_dims))
@@ -68,47 +69,16 @@ class BasicCNN(Network):
         sequence_input = Input(shape=(self.maxlen,), dtype='int32')
         embedded_sequences = embedding_layer(sequence_input)
 
-        cnn1 = Conv1D(filters=self.filters, kernel_size=self.kernel_size, activation='relu')(embedded_sequences)
-        cnn1 = MaxPooling1D()(cnn1)
-        cnn1 = Conv1D(filters=self.filters, kernel_size=self.kernel_size, activation='relu')(cnn1)
-        cnn1 = Dropout(self.dropout_rate)(cnn1)
-        cnn1 = BatchNormalization()(cnn1)
-        # cnn1 = Permute([2, 1])(cnn1)
-        cnn1 = MaxPooling1D()(cnn1)
-        cnn1 = Dense(200, activation='relu')(cnn1)
-        cnn1 = Dropout(self.dropout_rate)(cnn1)
-        cnn1 = BatchNormalization()(cnn1)
-        cnn1 = Flatten()(cnn1)
-
-        cnn2 = Conv1D(filters=self.filters, kernel_size=self.kernel_size-1, activation='relu')(embedded_sequences)
-        cnn2 = MaxPooling1D()(cnn2)
-        cnn2 = Conv1D(filters=self.filters, kernel_size=self.kernel_size-1, activation='relu')(cnn2)
-        cnn2 = Dropout(self.dropout_rate)(cnn2)
-        cnn2 = BatchNormalization()(cnn2)
-        # cnn2 = Permute([2, 1])(cnn2)
-        cnn2 = MaxPooling1D()(cnn2)
-        cnn2 = Dense(200, activation='relu')(cnn2)
-        cnn2 = Dropout(self.dropout_rate)(cnn2)
-        cnn2 = BatchNormalization()(cnn2)
-        cnn2 = Flatten()(cnn2)
-
-        cnn3 = Conv1D(filters=self.filters, kernel_size=self.kernel_size-2, activation='relu')(embedded_sequences)
-        cnn3 = MaxPooling1D()(cnn3)
-        cnn3 = Conv1D(filters=self.filters, kernel_size=self.kernel_size-2, activation='relu')(cnn3)
-        cnn3 = Dropout(self.dropout_rate)(cnn3)
-        cnn3 = BatchNormalization()(cnn3)
-        # cnn3 = Permute([2, 1])(cnn3)
-        cnn3 = MaxPooling1D()(cnn3)
-        cnn3 = Dense(200, activation='relu')(cnn3)
-        cnn3 = Dropout(self.dropout_rate)(cnn3)
-        cnn3 = BatchNormalization()(cnn3)
-        cnn3 = Flatten()(cnn3)
-
-        cnn = concatenate([cnn1, cnn2, cnn3])
-        cnn = Dense(300, activation='relu')(cnn)
+        cnn = Conv1D(filters=self.filters, kernel_size=self.kernel_size, padding='Valid', activation='relu')(embedded_sequences)
         cnn = Dropout(self.dropout_rate)(cnn)
+        cnn = BatchNormalization()(cnn)
 
-        preds = Dense(self.units, activation='softmax')(cnn)
+        lstm = Bidirectional(LSTM(self.rnn_dim, return_sequences=True))(cnn)
+        lstm = GlobalAveragePooling1D()(lstm)
+
+        # cnn = concatenate([cnn1, cnn2, cnn3])
+
+        preds = Dense(self.units, activation='softmax')(lstm)
         model = Model(inputs=sequence_input, outputs=preds)
 
         model.compile(loss=self.loss,
@@ -119,7 +89,7 @@ class BasicCNN(Network):
 
 
 def func():
-    network = BasicCNN()
+    network = CnnLstmPooling()
     network.build()
 
 

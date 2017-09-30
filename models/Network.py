@@ -103,14 +103,14 @@ class Network(object):
         if dev_feature.any() == None or dev_target.any()==None:
             self.model.fit(train_feature, train_target,
                            batch_size=50,
-                           nb_epoch=10, shuffle=True,
+                           nb_epoch=15, shuffle=True,
                            validation_split=0.2,
                            # callbacks=[model_checkpoint])
                            callbacks=[early_stopping, model_checkpoint])
         else:
             self.model.fit(train_feature, train_target,
                            batch_size=50,
-                           nb_epoch=10, shuffle=True,
+                           nb_epoch=15, shuffle=True,
                            validation_data=(dev_feature, dev_target),
                            # callbacks=[model_checkpoint])
                            callbacks=[early_stopping, model_checkpoint])
