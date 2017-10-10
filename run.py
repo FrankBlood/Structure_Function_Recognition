@@ -38,6 +38,7 @@ from models.BiLstmConv import BiLstmConv
 from models.BiLstmConv3 import BiLstmConv3
 from models.CnnPooling import CnnPooling
 from models.CnnLstmPooling import CnnLstmPooling
+from models.CnnBasedGru import CnnBasedGru
 from tools.utils import get_embedding_matrix, split_data, to_categorical, get_a_p_r_f
 
 import codecs
@@ -78,6 +79,8 @@ def train():
         network = CnnPooling()
     elif model_name == 'CnnLstmPooling':
         network = CnnLstmPooling()
+    elif model_name == 'CnnBasedGru':
+        network = CnnBasedGru()
     else:
         print("What the F**K!")
         return
