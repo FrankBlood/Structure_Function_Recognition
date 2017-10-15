@@ -39,17 +39,18 @@ from models.BiLstmConv3 import BiLstmConv3
 from models.CnnPooling import CnnPooling
 from models.CnnLstmPooling import CnnLstmPooling
 from models.CnnBasedGru import CnnBasedGru
+from models.GruInnerGru import GruInnerGru
 from tools.utils import get_embedding_matrix, split_data, to_categorical, get_a_p_r_f
 
 import codecs
 import json
 import numpy as np
 
-import tensorflow as tf
-from keras.backend.tensorflow_backend import set_session
-config = tf.ConfigProto()
-config.gpu_options.allow_growth = True
-set_session(tf.Session(config=config))
+# import tensorflow as tf
+# from keras.backend.tensorflow_backend import set_session
+# config = tf.ConfigProto()
+# config.gpu_options.allow_growth = True
+# set_session(tf.Session(config=config))
 
 def train():
     
@@ -81,6 +82,8 @@ def train():
         network = CnnLstmPooling()
     elif model_name == 'CnnBasedGru':
         network = CnnBasedGru()
+    elif model_name == 'GruInnerGru':
+        network = GruInnerGru()
     else:
         print("What the F**K!")
         return
@@ -92,6 +95,7 @@ def train():
         filter_json = json.load(fp)
 
     network.nb_words = min(len(word_index), config['network_config']['num_words'])+1
+    # network.set_from_json(config['network_config'])
 
     network.set_optimizer(optimizer_name=config['network_config']['optimizer_name'], lr=config['network_config']['lr'])
 
@@ -112,7 +116,9 @@ def train():
     train_feature, train_target, dev_feature, dev_target, test_feature, test_target = split_data(paded_sequences, categ_labels, 0.1)
 
     # train model with training data and evaluate with development data
-    network.train(train_feature, train_target, dev_feature, dev_target)
+    bst_model_path = network.train(train_feature, train_target, dev_feature, dev_target)
+
+    network.load_model(bst_model_path)
 
     # test model with test model
     loss, accu = network.evaluate(test_feature, test_target, batch_size=512)

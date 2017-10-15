@@ -33,6 +33,7 @@ from keras.preprocessing.sequence import pad_sequences
 from keras.utils import to_categorical
 import numpy as np
 import random
+random.seed(1234)
 
 
 def get_a_p_r_f(target, predict, category):

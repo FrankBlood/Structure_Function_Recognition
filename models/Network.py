@@ -56,13 +56,13 @@ class Network(object):
         self.optimizer = optimizer
 
     def set_from_json(self, network_config):
-        self.embedding_dims = network_config['embedding_dims']
-        self.maxlen = network_config['maxlen']
+        # self.embedding_dims = network_config['embedding_dims']
+        # self.maxlen = network_config['maxlen']
         self.rnn_dim = network_config['rnn_dim']
-        self.dropout_rate = network_config['dropout_rate']
-        self.units = network_config['units']
-        self.loss = network_config['loss']
-        self.optimizer = network_config['optimizer']
+        # self.dropout_rate = network_config['dropout_rate']
+        # self.units = network_config['units']
+        # self.loss = network_config['loss']
+        # self.optimizer = network_config['optimizer']
             
 
     def set_name(self, model_name):
@@ -92,7 +92,7 @@ class Network(object):
 
         early_stopping = EarlyStopping(monitor='val_acc', patience=3)
         now_time = '_'.join(time.asctime(time.localtime(time.time())).split(' '))
-        bst_model_path = './models/save/' + self.model_name + '_' + now_time + '.h5'
+        bst_model_path = curdir + '/save/' + self.model_name + '_' + now_time + '.h5'
         print('bst_model_path:', bst_model_path)
         model_checkpoint = ModelCheckpoint(bst_model_path, monitor='val_acc', save_best_only=True,
                                            save_weights_only=True)
@@ -114,6 +114,7 @@ class Network(object):
                            validation_data=(dev_feature, dev_target),
                            # callbacks=[model_checkpoint])
                            callbacks=[early_stopping, model_checkpoint])
+        return bst_model_path
            
 
     def set_optimizer(self, optimizer_name='nadam' ,lr=0.001):
