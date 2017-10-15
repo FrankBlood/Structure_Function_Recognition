@@ -21,13 +21,14 @@ import os
 import sys
 
 curdir = os.path.dirname(os.path.abspath(__file__))
+parentdir = os.path.dirname(curdir)
 sys.path.insert(0, os.path.dirname(curdir))
 
 if sys.version_info[0] < 3:
     reload(sys)
     sys.setdefaultencoding("utf-8")
 
-from keras.callbacks import EarlyStopping, ModelCheckpoint
+from keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard
 import time
 from keras.models import Sequential, Model
 from keras.layers import Input, Embedding, Dense, LSTM, GRU, Conv1D, GlobalMaxPooling1D, MaxPooling1D, GlobalAveragePooling1D
@@ -97,6 +98,9 @@ class Network(object):
         model_checkpoint = ModelCheckpoint(bst_model_path, monitor='val_acc', save_best_only=True,
                                            save_weights_only=True)
 
+        tb_cb = TensorBoard(log_dir=parentdir+'/tensorboard/'+self.model_name, histogram_freq=1, write_graph=True, write_images=False,
+                            embeddings_freq=0, embeddings_layer_names=None, embeddings_metadata=None)
+
         if os.path.exists(bst_model_path):
             self.model.load_weights(bst_model_path)
 
@@ -106,14 +110,16 @@ class Network(object):
                            nb_epoch=15, shuffle=True,
                            validation_split=0.2,
                            # callbacks=[model_checkpoint])
-                           callbacks=[early_stopping, model_checkpoint])
+                           # callbacks=[early_stopping, model_checkpoint])
+                           callbacks=[early_stopping, model_checkpoint, tb_cb])
         else:
             self.model.fit(train_feature, train_target,
                            batch_size=50,
                            nb_epoch=15, shuffle=True,
                            validation_data=(dev_feature, dev_target),
                            # callbacks=[model_checkpoint])
-                           callbacks=[early_stopping, model_checkpoint])
+                           # callbacks=[early_stopping, model_checkpoint])
+                           callbacks=[early_stopping, model_checkpoint, tb_cb])
         return bst_model_path
            
 
