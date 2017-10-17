@@ -137,6 +137,7 @@ def train():
         accuracy, precision, recall, f1score = get_a_p_r_f(target_class, y_class, category)
         print('For category %s: the accuracy is %s, the precision is %s, the recall is %s and the f1score is %s'
               % (category, accuracy, precision, recall, f1score))
+    # Test git
 
 if __name__ == "__main__":
     train()
